@@ -86,23 +86,67 @@ def buscaPontosInstalados():
     
     return
 
-def findLatLong(logradouro, cidade, UF, bairro):
+#Tentativa de solução para o lat-long
+#se mostrou ineficiente
+def findLatLong():
 
-    geolocator = Nominatim(user_agent="mccom")
-    location = geolocator.geocode(logradouro + ", " + cidade +", "+ UF + " - " +bairro)
-
-    return location.latitude, location.longitude
-
-
+    f = open('tabelaErro-Instalados.txt', 'r')
+    instalados = f.read()
+    rowsIntalados = instalados.split('\n')
+    f.close()
+    
+    for data in rowsIntalados:
+        colunasInstalados = data.split(',')
+        logradouro = colunasInstalados[3]
+        cidade = colunasInstalados[4]
+        uf = colunasInstalados[5]
+        bairro = colunasInstalados[6]
+        try:
+            geolocator = Nominatim(user_agent="mccom")
+            location = geolocator.geocode(logradouro + ", " + cidade +", "+ uf + " - " +bairro)
+            print(colunasInstalados[0],colunasInstalados[1],location.latitude,location.longitude)
+            arq = open('tabelaErro-InstaladosCorrigidos.txt', 'a')
+            arq.write(colunasInstalados[0]+","+colunasInstalados[1]+","+str(location.latitude)+","+str(location.longitude)+'\n')
+            arq.close()
+        except:
+            try:
+                geolocator = Nominatim(user_agent="mccom")
+                location = geolocator.geocode("" + ", " + cidade +", "+ uf + " - " +bairro)
+                print(colunasInstalados[0],colunasInstalados[1],location.latitude,location.longitude)
+                arq = open('tabelaErro-InstaladosCorrigidos.txt', 'a')
+                arq.write(colunasInstalados[0]+","+colunasInstalados[1]+","+str(location.latitude)+","+str(location.longitude)+'\n')
+                arq.close()
+            except:
+                try:
+                    geolocator = Nominatim(user_agent="mccom")
+                    location = geolocator.geocode(logradouro + ", " + cidade +", "+ uf + " - " +"")
+                    print(colunasInstalados[0],colunasInstalados[1],location.latitude,location.longitude)
+                    arq = open('tabelaErro-InstaladosCorrigidos.txt', 'a')
+                    arq.write(colunasInstalados[0]+","+colunasInstalados[1]+","+str(location.latitude)+","+str(location.longitude)+'\n')
+                    arq.close()
+                except:
+                    try:
+                        geolocator = Nominatim(user_agent="mccom")
+                        location = geolocator.geocode("" + ", " + cidade +", "+ uf + " - " +"")
+                        print(colunasInstalados[0],colunasInstalados[1],location.latitude,location.longitude)
+                        arq = open('tabelaErro-InstaladosCorrigidos.txt', 'a')
+                        arq.write(colunasInstalados[0]+","+colunasInstalados[1]+","+str(location.latitude)+","+str(location.longitude)+'\n')
+                        arq.close()
+                    except:
+                        arq = open('tabelaErro-InstaladosCorrigidos.txt', 'a')
+                        arq.write(colunasInstalados[0]+","+colunasInstalados[1]+'\n')
+                        arq.close()
+                        continue
+    return
 
 if __name__ == '__main__':
-    # tabelaGesac = 'Relatório GESAC 2021-01-25 9h44min + Contatos.xlsx'
-    # createListGesac(tabelaGesac)
+    tabelaGesac = 'Relatório GESAC 2021-01-25 9h44min + Contatos.xlsx'
+    createListGesac(tabelaGesac)
     
-    # tabelaErro = 'Resultado carga - 2021-01-23_06-01-42_GESAC.log'
-    # filtroTabelaErroCodGesac(tabelaErro)
+    tabelaErro = 'Resultado carga - 2021-01-23_06-01-42_GESAC.log'
+    filtroTabelaErroCodGesac(tabelaErro)
     
-    # buscaPontosInstalados()
+    buscaPontosInstalados()
     
-    latitude, longitude = findLatLong("", "Porto Velho", "RO", "-")
-    print(latitude, longitude)
+    findLatLong()
+    print("Done!")
